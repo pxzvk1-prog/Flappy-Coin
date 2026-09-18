@@ -2,105 +2,113 @@
 <html lang="ru">
 <head>
     <script src="https://telegram.org/js/telegram-web-app.js?63"></script>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Flappy Coin</title>
 
-<style>
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-    -webkit-tap-highlight-color: transparent;
-}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
-body {
-    min-height: 100vh;
-    background: linear-gradient(180deg, #171735, #090914);
-    color: white;
-    font-family: Arial, sans-serif;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    overflow: hidden;
-}
+    <title>Flappy Coin</title>
 
-.game {
-    width: 100%;
-    max-width: 430px;
-    padding: 15px;
-    text-align: center;
-}
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
 
-h1 {
-    font-size: 32px;
-    margin-bottom: 12px;
-}
+        body {
+            min-height: 100vh;
+            background: linear-gradient(180deg, #171735, #090914);
+            color: white;
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
 
-.stats {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 12px;
-}
+        .game {
+            width: 100%;
+            max-width: 430px;
+            padding: 15px;
+            text-align: center;
+        }
 
-.stat {
-    flex: 1;
-    background: rgba(255,255,255,.12);
-    padding: 12px 5px;
-    border-radius: 15px;
-    font-size: 16px;
-}
+        h1 {
+            font-size: 32px;
+            margin-bottom: 12px;
+        }
 
-#game {
-    width: 100%;
-    height: 520px;
-    display: block;
-    background: #70cfff;
-    border: 3px solid rgba(255,255,255,.3);
-    border-radius: 20px;
-    touch-action: none;
-}
+        .stats {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
 
-button {
-    width: 100%;
-    margin-top: 14px;
-    padding: 17px;
-    border: 0;
-    border-radius: 16px;
-    background: #ffd21f;
-    color: #171717;
-    font-size: 19px;
-    font-weight: bold;
-}
+        .stat {
+            flex: 1;
+            background: rgba(255,255,255,.12);
+            padding: 12px 5px;
+            border-radius: 15px;
+            font-size: 18px;
+            font-weight: bold;
+        }
 
-button:active {
-    transform: scale(.97);
-}
+        #game {
+            width: 100%;
+            height: 520px;
+            display: block;
+            background: #70cfff;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 20px;
+            touch-action: none;
+        }
 
-#message {
-    margin-top: 12px;
-    font-size: 20px;
-    min-height: 25px;
-}
-</style>
+        button {
+            width: 100%;
+            margin-top: 14px;
+            padding: 17px;
+            border: 0;
+            border-radius: 16px;
+            background: #ffd21f;
+            color: #171717;
+            font-size: 19px;
+            font-weight: bold;
+        }
+
+        button:active {
+            transform: scale(.97);
+        }
+
+        #message {
+            margin-top: 12px;
+            font-size: 20px;
+            min-height: 25px;
+        }
+    </style>
 </head>
 
 <body>
 
 <div class="game">
 
-<h1>🪙 Flappy Coin</h1>
+    <h1>🪙 Flappy Coin</h1>
 
-<div class="stats">
-    <div class="stat">💰 <span id="coins">0</span></div>
-    <div class="stat">🏆 <span id="score">0</span></div>
-</div>
+    <div class="stats">
+        <div class="stat">
+            💰 <span id="coins">0</span>
+        </div>
 
-<canvas id="game"></canvas>
+        <div class="stat">
+            🏆 <span id="score">0</span>
+        </div>
+    </div>
 
-<button id="start">🎮 НАЧАТЬ ИГРУ</button>
+    <canvas id="game"></canvas>
 
-<div id="message">Нажми кнопку, чтобы начать</div>
+    <button id="start">🎮 НАЧАТЬ ИГРУ</button>
+
+    <div id="message">Нажми кнопку, чтобы начать</div>
 
 </div>
 
@@ -117,14 +125,13 @@ let W = 0;
 let H = 0;
 
 let running = false;
+
 let score = 0;
-let coins = 0;
+let roundCoins = 0;
 
 let bestScore = Number(localStorage.getItem("flappyBest") || 0);
 let totalCoins = Number(localStorage.getItem("flappyCoins") || 0);
 
-coinsElement.textContent = totalCoins;
-scoreElement.textContent = bestScore;
 let animation = null;
 let lastTime = 0;
 let spawnTimer = 0;
@@ -142,6 +149,37 @@ const pipeSpeed = 0.25;
 
 let pipes = [];
 let bonusCoins = [];
+
+
+/* =========================
+   ЗАГРУЗКА СОХРАНЕНИЙ
+========================= */
+
+function loadSavedData() {
+    bestScore = Number(localStorage.getItem("flappyBest") || 0);
+    totalCoins = Number(localStorage.getItem("flappyCoins") || 0);
+
+    scoreElement.textContent = bestScore;
+    coinsElement.textContent = totalCoins;
+}
+
+
+/* =========================
+   СОХРАНЕНИЕ
+========================= */
+
+function saveBestScore() {
+    localStorage.setItem("flappyBest", String(bestScore));
+}
+
+function saveCoins() {
+    localStorage.setItem("flappyCoins", String(totalCoins));
+}
+
+
+/* =========================
+   РАЗМЕР CANVAS
+========================= */
 
 function resize() {
     const rect = canvas.getBoundingClientRect();
@@ -161,12 +199,14 @@ function resize() {
 
 window.addEventListener("resize", resize);
 
-function reset() {
-    score = 0;
-    coins = 0;
 
-    scoreElement.textContent = bestScore;
-coinsElement.textContent = totalCoins;
+/* =========================
+   НОВАЯ ИГРА
+========================= */
+
+function resetGame() {
+    score = 0;
+    roundCoins = 0;
 
     pipes = [];
     bonusCoins = [];
@@ -176,7 +216,17 @@ coinsElement.textContent = totalCoins;
     player.velocity = 0;
 
     spawnTimer = 0;
+
+    /* Показываем сохранённый рекорд,
+       а не сбрасываем его в 0 */
+    scoreElement.textContent = bestScore;
+    coinsElement.textContent = totalCoins;
 }
+
+
+/* =========================
+   ПРЫЖОК
+========================= */
 
 function flap() {
     if (!running) return;
@@ -184,7 +234,13 @@ function flap() {
     player.velocity = jumpPower;
 }
 
+
+/* =========================
+   СОЗДАНИЕ ТРУБЫ
+========================= */
+
 function createPipe() {
+
     const gap = Math.min(170, H * 0.30);
     const margin = 55;
 
@@ -192,7 +248,8 @@ function createPipe() {
 
     const top =
         margin +
-        Math.random() * Math.max(1, maxTop - margin);
+        Math.random() *
+        Math.max(1, maxTop - margin);
 
     pipes.push({
         x: W + 20,
@@ -210,17 +267,21 @@ function createPipe() {
     });
 }
 
+
+/* =========================
+   ФОН
+========================= */
+
 function drawBackground() {
+
     ctx.fillStyle = "#70cfff";
     ctx.fillRect(0, 0, W, H);
 
-    // облака
     ctx.fillStyle = "rgba(255,255,255,.75)";
 
     drawCloud(70, 75, 1);
     drawCloud(W - 90, 160, .8);
 
-    // земля
     ctx.fillStyle = "#7bc043";
     ctx.fillRect(0, H - 25, W, 25);
 
@@ -229,16 +290,36 @@ function drawBackground() {
 }
 
 function drawCloud(x, y, scale) {
+
     ctx.beginPath();
 
     ctx.arc(x, y, 20 * scale, 0, Math.PI * 2);
-    ctx.arc(x + 25 * scale, y - 10 * scale, 28 * scale, 0, Math.PI * 2);
-    ctx.arc(x + 55 * scale, y, 20 * scale, 0, Math.PI * 2);
+    ctx.arc(
+        x + 25 * scale,
+        y - 10 * scale,
+        28 * scale,
+        0,
+        Math.PI * 2
+    );
+
+    ctx.arc(
+        x + 55 * scale,
+        y,
+        20 * scale,
+        0,
+        Math.PI * 2
+    );
 
     ctx.fill();
 }
 
+
+/* =========================
+   ИГРОК
+========================= */
+
 function drawPlayer() {
+
     ctx.save();
 
     ctx.translate(player.x, player.y);
@@ -257,12 +338,19 @@ function drawPlayer() {
     ctx.font = "bold 18px Arial";
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
+
     ctx.fillText("$", 0, 1);
 
     ctx.restore();
 }
 
+
+/* =========================
+   ТРУБЫ
+========================= */
+
 function drawPipes() {
+
     for (const pipe of pipes) {
 
         ctx.fillStyle = "#35a900";
@@ -299,7 +387,13 @@ function drawPipes() {
     }
 }
 
+
+/* =========================
+   МОНЕТЫ
+========================= */
+
 function drawCoins() {
+
     for (const coin of bonusCoins) {
 
         if (coin.collected) continue;
@@ -307,6 +401,7 @@ function drawCoins() {
         ctx.fillStyle = "#ffd21f";
 
         ctx.beginPath();
+
         ctx.arc(
             coin.x,
             coin.y,
@@ -314,6 +409,7 @@ function drawCoins() {
             0,
             Math.PI * 2
         );
+
         ctx.fill();
 
         ctx.strokeStyle = "#b88600";
@@ -324,13 +420,21 @@ function drawCoins() {
         ctx.font = "bold 13px Arial";
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
+
         ctx.fillText("$", coin.x, coin.y);
     }
 }
 
+
+/* =========================
+   СТОЛКНОВЕНИЕ
+========================= */
+
 function hitPipe(pipe) {
+
     const left = player.x - player.r;
     const right = player.x + player.r;
+
     const top = player.y - player.r;
     const bottom = player.y + player.r;
 
@@ -352,7 +456,13 @@ function hitPipe(pipe) {
     return false;
 }
 
+
+/* =========================
+   МОНЕТЫ
+========================= */
+
 function collectCoins() {
+
     for (const coin of bonusCoins) {
 
         if (coin.collected) continue;
@@ -367,21 +477,28 @@ function collectCoins() {
 
             coin.collected = true;
 
-            coins++;
+            roundCoins++;
+            totalCoins++;
 
-totalCoins += 1;
-localStorage.setItem("flappyCoins", totalCoins);
+            saveCoins();
 
-coinsElement.textContent = totalCoins; 
+            coinsElement.textContent = totalCoins;
         }
     }
 }
+
+
+/* =========================
+   ИГРОВОЙ UPDATE
+========================= */
 
 function update(delta) {
 
     player.velocity += gravity * delta;
     player.y += player.velocity * delta;
 
+
+    /* Земля / верх */
     if (
         player.y - player.r < 0 ||
         player.y + player.r > H - 25
@@ -390,38 +507,57 @@ function update(delta) {
         return;
     }
 
+
+    /* Движение труб */
     for (const pipe of pipes) {
 
         pipe.x -= pipeSpeed * delta;
 
+
+        /* Игрок прошёл трубу */
         if (
-    !pipe.passed &&
-    pipe.x + pipe.width < player.x
-) {
-    pipe.passed = true;
+            !pipe.passed &&
+            pipe.x + pipe.width < player.x
+        ) {
 
-    score++;
+            pipe.passed = true;
 
-    if (score > bestScore) {
-        bestScore = score;
-        localStorage.setItem("flappyBest", bestScore);
-    }
+            score++;
 
-    scoreElement.textContent = bestScore;
+
+            /* Обновляем рекорд */
+            if (score > bestScore) {
+
+                bestScore = score;
+
+                saveBestScore();
+            }
+
+
+            /* Всегда показываем текущий лучший результат */
+            scoreElement.textContent = bestScore;
         }
 
+
+        /* Столкновение */
         if (hitPipe(pipe)) {
+
             gameOver();
             return;
         }
     }
 
+
+    /* Движение монет */
     for (const coin of bonusCoins) {
         coin.x -= pipeSpeed * delta;
     }
 
+
     collectCoins();
 
+
+    /* Удаление старых объектов */
     pipes = pipes.filter(
         pipe => pipe.x + pipe.width > -20
     );
@@ -430,20 +566,35 @@ function update(delta) {
         coin => coin.x > -30
     );
 
+
+    /* Новая труба */
     spawnTimer += delta;
 
     if (spawnTimer > 1500) {
+
         createPipe();
+
         spawnTimer = 0;
     }
 }
 
+
+/* =========================
+   DRAW
+========================= */
+
 function draw() {
+
     drawBackground();
     drawPipes();
     drawCoins();
     drawPlayer();
 }
+
+
+/* =========================
+   GAME LOOP
+========================= */
 
 function loop(time) {
 
@@ -469,19 +620,29 @@ function loop(time) {
     }
 }
 
+
+/* =========================
+   START
+========================= */
+
 function startGame() {
 
     if (animation) {
         cancelAnimationFrame(animation);
     }
 
-    reset();
+    loadSavedData();
+
+    resetGame();
 
     running = true;
+
     lastTime = 0;
 
     startButton.textContent = "🪙 ИГРА ИДЁТ";
-    message.textContent = "👆 Нажимай на экран, чтобы лететь";
+
+    message.textContent =
+        "👆 Нажимай на экран, чтобы лететь";
 
     createPipe();
 
@@ -489,31 +650,74 @@ function startGame() {
         requestAnimationFrame(loop);
 }
 
+
+/* =========================
+   GAME OVER
+========================= */
+
 function gameOver() {
-    if (score > bestScore) {
-        bestScore = score;
-        localStorage.setItem("flappyBest", bestScore);
-    }
-scoreElement.textContent = bestScore;
+
     running = false;
 
+
     if (animation) {
+
         cancelAnimationFrame(animation);
+
         animation = null;
     }
+
+
+    /* На всякий случай ещё раз сохраняем */
+    if (score > bestScore) {
+
+        bestScore = score;
+
+        saveBestScore();
+    }
+
+
+    scoreElement.textContent = bestScore;
+    coinsElement.textContent = totalCoins;
+
 
     startButton.textContent = "🔄 ИГРАТЬ СНОВА";
 
     message.textContent =
-        "Игра окончена! Очки: " + score;
+        "Игра окончена! Рекорд: " + bestScore;
 }
 
-startButton.addEventListener("click", startGame);
 
-canvas.addEventListener("pointerdown", function(event) {
-    event.preventDefault();
-    flap();
-});
+/* =========================
+   КНОПКА
+========================= */
+
+startButton.addEventListener(
+    "click",
+    startGame
+);
+
+
+/* =========================
+   НАЖАТИЕ НА ИГРУ
+========================= */
+
+canvas.addEventListener(
+    "pointerdown",
+    function(event) {
+
+        event.preventDefault();
+
+        flap();
+    }
+);
+
+
+/* =========================
+   ЗАПУСК
+========================= */
+
+loadSavedData();
 
 resize();
 </script>
