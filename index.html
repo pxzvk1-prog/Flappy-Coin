@@ -120,7 +120,18 @@ const startButton = document.getElementById("start");
 const scoreElement = document.getElementById("score");
 const coinsElement = document.getElementById("coins");
 const message = document.getElementById("message");
+const tg = window.Telegram.WebApp;
 
+tg.ready();
+
+const user = tg.initDataUnsafe?.user;
+
+if (user) {
+    const playerName = document.getElementById("playerName");
+
+    playerName.textContent =
+        " — " + user.first_name;
+}
 let W = 0;
 let H = 0;
 
