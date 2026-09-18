@@ -123,7 +123,30 @@ const message = document.getElementById("message");
 const tg = window.Telegram.WebApp;
 
 tg.ready();
+const API_URL = "https://5828cc140c9e70.lhr.life";
 
+async function sendGameResult(score, coins) {
+    try {
+        const response = await fetch(API_URL + "/api/game", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                initData: tg.initData,
+                score: score,
+                coins: coins
+            })
+        });
+
+        const data = await response.json();
+
+        console.log("Ответ сервера:", data);
+
+    } catch (error) {
+        console.error("Ошибка отправки результата:", error);
+    }
+}
 const user = tg.initDataUnsafe?.user;
 
 if (user) {
