@@ -123,8 +123,7 @@ const message = document.getElementById("message");
 const tg = window.Telegram.WebApp;
 
 tg.ready();
-const API_URL = "https://5ee3c604570814.lhr.life";
-
+const API_URL = "https://a15fb9c7b2ca4b.lhr.life";
 async function sendGameResult(score, coins) {
     try {
         const response = await fetch(API_URL + "/api/game", {
