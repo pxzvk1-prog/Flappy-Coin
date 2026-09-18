@@ -489,7 +489,7 @@ function gameOver() {
         bestScore = score;
         localStorage.setItem("flappyBest", bestScore);
     }
-
+scoreElement.textContent = bestScore;
     running = false;
 
     if (animation) {
