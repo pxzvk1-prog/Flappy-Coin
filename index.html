@@ -710,7 +710,8 @@ function gameOver() {
         saveBestScore();
     }
 
-
+    sendGameResult(score, roundCoins);
+    
     scoreElement.textContent = bestScore;
     coinsElement.textContent = totalCoins;
 
