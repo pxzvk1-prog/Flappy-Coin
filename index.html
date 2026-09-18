@@ -119,8 +119,12 @@ let H = 0;
 let running = false;
 let score = 0;
 let coins = 0;
-let bestScore = Number(localStorage.getItem("flappyBest") || 0);
 
+let bestScore = Number(localStorage.getItem("flappyBest") || 0);
+let totalCoins = Number(localStorage.getItem("flappyCoins") || 0);
+
+coinsElement.textContent = totalCoins;
+scoreElement.textContent = bestScore;
 let animation = null;
 let lastTime = 0;
 let spawnTimer = 0;
