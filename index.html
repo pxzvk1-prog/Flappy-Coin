@@ -395,14 +395,19 @@ function update(delta) {
         pipe.x -= pipeSpeed * delta;
 
         if (
-            !pipe.passed &&
-            pipe.x + pipe.width < player.x
-        ) {
-            pipe.passed = true;
+    !pipe.passed &&
+    pipe.x + pipe.width < player.x
+) {
+    pipe.passed = true;
 
-            score++;
+    score++;
 
-            scoreElement.textContent = score;
+    if (score > bestScore) {
+        bestScore = score;
+        localStorage.setItem("flappyBest", bestScore);
+    }
+
+    scoreElement.textContent = bestScore;
         }
 
         if (hitPipe(pipe)) {
