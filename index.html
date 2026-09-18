@@ -369,7 +369,10 @@ function collectCoins() {
 
             coins++;
 
-            coinsElement.textContent = coins;
+totalCoins += 1;
+localStorage.setItem("flappyCoins", totalCoins);
+
+coinsElement.textContent = totalCoins; 
         }
     }
 }
